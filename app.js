@@ -16,6 +16,9 @@ const Campground = require("./models/campground");
 const mongoose = require("mongoose");
 const { createDiffieHellmanGroup } = require("crypto");
 
+//Logging
+const morgan = require("morgan");
+
 mongoose
   .connect("mongodb://127.0.0.1:27017/yelpcamp")
   .then(() => {
@@ -34,6 +37,9 @@ mongoose.connection.on("error", (err) => {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
+
+//logging middleware
+app.use(morgan("tiny"));
 
 //request hadlers
 app.get("/", (req, res) => {
@@ -105,6 +111,10 @@ app.delete("/campgrounds/:id", async (req, res) => {
   } catch (err) {
     console.log(`Error while deleting: ${err}`);
   }
+});
+
+app.use((req, res) => {
+  res.status(404).send("Not Found !");
 });
 
 app.listen(PORT, () => {
