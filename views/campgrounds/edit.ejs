@@ -1,43 +1,74 @@
 <% layout('/layouts/boilerplate.ejs')%>
-<form
-  method="POST"
-  action="/campgrounds/<%=campground._id%>/edit?_method=PATCH"
->
-  <div>
-    <label for="title">Title</label>
-    <input
-      type="text"
-      id="title"
-      name="campground[title]"
-      value="<%=campground.title%>"
-    />
+<div class="row">
+  <h1 class="text-center">Edit Campground</h1>
+  <!-- The below div spans to 6 columns but offset is 3. So 3-6-3, total 12. Another way of centering -->
+  <div class="col-6 offset-3">
+    <form
+      action="/campgrounds/<%=campground._id%>/edit?_method=PATCH"
+      method="POST"
+    >
+      <div class="mb-3">
+        <label class="form-label" for="title">Title</label>
+        <input
+          class="form-control"
+          type="text"
+          id="title"
+          name="campground[title]"
+          value="<%=campground.title%>"
+        />
+      </div>
+      <div class="mb-3">
+        <label class="form-label" for="description">Description</label>
+        <textarea
+          class="form-control"
+          type="text"
+          id="description"
+          name="campground[description]"
+        >
+<%=campground.description%></textarea
+        >
+      </div>
+      <div class="mb-3">
+        <label class="form-label" for="location">Location</label>
+        <input
+          class="form-control"
+          type="text"
+          id="location"
+          name="campground[location]"
+          value="<%=campground.location%>"
+        />
+      </div>
+      <div class="mb-3">
+        <label class="form-label" for="image">Image URL</label>
+        <input
+          class="form-control"
+          type="text"
+          id="image"
+          name="campground[image]"
+          value="<%=campground.image%>"
+        />
+      </div>
+      <div class="input-group mb-3">
+        <label class="form-label" for="price">Price</label>
+        <div class="input-group">
+          <span
+            class="input-group-text"
+            id="price-label"
+            aria-labelledby="price"
+            >&#8377;</span
+          >
+          <input
+            type="text"
+            id="price"
+            placeholder="0"
+            name="campground[price]"
+            class="form-control"
+            aria-label="Amount (in Rupees)"
+            value="<%=campground.price%>"
+          />
+        </div>
+      </div>
+      <button class="btn btn-primary" type="submit">Update</button>
+    </form>
   </div>
-  <div>
-    <label for="title">Description</label>
-    <input
-      type="text"
-      id="description"
-      name="campground[description]"
-      value="<%= campground.description%>"
-    />
-  </div>
-  <div>
-    <label for="location">Location</label>
-    <input
-      type="text"
-      id="location"
-      name="campground[location]"
-      value="<%= campground.location%>"
-    />
-  </div>
-  <div>
-    <label for="price">Price</label>
-    <input
-      type="text"
-      id="price"
-      name="campground[price]"
-      value="<%= campground.price%>"
-    />
-  </div>
-  <button type="submit">Update</button>
-</form>
+</div>

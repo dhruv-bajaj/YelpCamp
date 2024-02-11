@@ -1,4 +1,5 @@
-const mockData = require("./mockData");
+const cities = require("./cities");
+const { places, descriptors } = require("./seedHelpers");
 const mongoose = require("mongoose");
 mongoose
   .connect("mongodb://127.0.0.1:27017/yelpcamp")
@@ -14,16 +15,30 @@ mongoose.connection.on("error", (err) => {
   console.log(err);
 });
 
-const Campground = require("../models/campground");
-const insertMockData = async () => {
-  await Campground.deleteMany({});
-  Campground.insertMany(mockData)
-    .then(() => {
-      console.log("Data inserted");
-      mongoose.connection.close();
-    })
-    .catch((err) => {
-      console.log(`${err}`);
-    });
+const getRandomElementFromArray = (array) => {
+  return array[Math.floor(Math.random() * array.length)];
 };
-insertMockData();
+
+const Campground = require("../models/campground");
+const seedDB = async () => {
+  await Campground.deleteMany({});
+  for (let i = 0; i < 50; i++) {
+    const random1000 = Math.floor(Math.random() * 1000);
+    const camp = new Campground({
+      location: `${cities[random1000].city}, ${cities[random1000].state}`,
+      title: `${getRandomElementFromArray(
+        descriptors
+      )} ${getRandomElementFromArray(places)}`,
+      image: `https://source.unsplash.com/random/600x600?camping,${i}`,
+      description: `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. `,
+      price: `${Math.floor(Math.random() * 2000) + 799}`,
+    });
+    await camp.save();
+  }
+};
+
+seedDB().then(() => {
+  mongoose.connection.close().then(() => {
+    console.log("Connection closed");
+  });
+});

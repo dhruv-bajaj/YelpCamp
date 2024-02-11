@@ -78,17 +78,6 @@ app.get("/campgrounds/:id", async (req, res) => {
   }
 });
 
-app.get("/makecampground", async (req, res) => {
-  const campground = new Campground({
-    title: "Backyard of home",
-    price: "free",
-    description: "Home",
-    location: "Saharanpur",
-  });
-  await campground.save();
-  res.render("Home", { campground });
-});
-
 app.post("/campgrounds", async (req, res) => {
   const { campground } = req.body;
   const newCampground = new Campground({ ...campground });
