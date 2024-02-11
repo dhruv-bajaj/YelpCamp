@@ -1,26 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Campground Details</title>
-  </head>
-  <body>
-    <ul>
-      <li><%=campground.title%></li>
-      <li><%=campground.description%></li>
-      <li><%=campground.price%></li>
-      <li><%=campground.location%></li>
-    </ul>
-    <form method="GET" action="/campgrounds/<%=campground._id%>/edit">
-      <button type="submit">Edit Campground</button>
-    </form>
-    <form
-      method="POST"
-      action="/campgrounds/<%=campground._id%>?_method=DELETE"
-    >
-      <button>Delete</button>
-    </form>
-    <a href="/campgrounds">Back to campgrounds</a>
-  </body>
-</html>
+<% layout('/layouts/boilerplate.ejs')%>
+<ul>
+  <li><%=campground.title%></li>
+  <li><%=campground.description%></li>
+  <li><%=campground.price%></li>
+  <li><%=campground.location%></li>
+</ul>
+<form method="GET" action="/campgrounds/<%=campground._id%>/edit">
+  <button type="submit">Edit Campground</button>
+</form>
+<form method="POST" action="/campgrounds/<%=campground._id%>?_method=DELETE">
+  <button>Delete</button>
+</form>
+<a href="/campgrounds">Back to campgrounds</a>

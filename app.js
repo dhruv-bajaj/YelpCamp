@@ -3,9 +3,16 @@ const express = require("express");
 const app = express();
 const PORT = 3000;
 const methodOverride = require("method-override");
+const path = require("path");
+
+//Setting up ejs-mate
+const ejsMate = require("ejs-mate");
+
+//Here we are registering the template engine
+// This callback function will be called for ejs files
+app.engine("ejs", ejsMate);
 
 // Setting up ejs
-const path = require("path");
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "/views"));
 
