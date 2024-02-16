@@ -3,7 +3,7 @@
   <h1 class="text-center">New Campground</h1>
   <!-- The below div spans to 6 columns but offset is 3. So 3-6-3, total 12. Another way of centering -->
   <div class="col-6 offset-3">
-    <form action="/campgrounds" method="POST">
+    <form action="/campgrounds" method="POST" novalidate class="validated-form">
       <div class="mb-3">
         <label class="form-label" for="title">Title</label>
         <input
@@ -11,7 +11,9 @@
           type="text"
           id="title"
           name="campground[title]"
+          required
         />
+        <div class="valid-feedback">Looks good!</div>
       </div>
       <div class="mb-3">
         <label class="form-label" for="description">Description</label>
@@ -20,7 +22,9 @@
           type="text"
           id="description"
           name="campground[description]"
+          required
         ></textarea>
+        <div class="valid-feedback">Looks good!</div>
       </div>
       <div class="mb-3">
         <label class="form-label" for="location">Location</label>
@@ -29,7 +33,9 @@
           type="text"
           id="location"
           name="campground[location]"
+          required
         />
+        <div class="valid-feedback">Looks good!</div>
       </div>
       <div class="mb-3">
         <label class="form-label" for="image">Image URL</label>
@@ -38,7 +44,9 @@
           type="text"
           id="image"
           name="campground[image]"
+          required
         />
+        <div class="valid-feedback">Looks good!</div>
       </div>
       <div class="input-group mb-3">
         <label class="form-label" for="price">Price</label>
@@ -50,13 +58,15 @@
             >&#8377;</span
           >
           <input
-            type="text"
+            type="number"
             id="price"
             placeholder="0"
             name="campground[price]"
             class="form-control"
             aria-label="Amount (in Rupees)"
+            required
           />
+          <div class="valid-feedback">Looks good!</div>
         </div>
       </div>
       <button class="btn btn-primary" type="submit">Submit</button>
