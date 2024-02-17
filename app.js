@@ -5,6 +5,9 @@ const PORT = 3000;
 const methodOverride = require("method-override");
 const path = require("path");
 
+//Requiring Joi for schema validation
+const Joi = require("joi");
+
 //Importing catchAsync wrapper function and ExpressError class
 const catchAsync = require("./utils/catchAsync");
 const ExpressError = require("./utils/ExpressError");
@@ -29,6 +32,7 @@ const { createDiffieHellmanGroup } = require("crypto");
 
 //Logging
 const morgan = require("morgan");
+const { campgroundSchemaJoi } = require("./schemasJoi");
 
 mongoose
   .connect("mongodb://127.0.0.1:27017/yelpcamp")
@@ -43,6 +47,17 @@ mongoose
 mongoose.connection.on("error", (err) => {
   console.log(err);
 });
+
+//middleware to check schema using Joi
+const validateCampgroundSchema = (req, res, next) => {
+  const { error } = campgroundSchemaJoi.validate(req.body);
+  if (error) {
+    const message = error.details.map((el) => el.message).join(",");
+    throw new ExpressError(message, 400);
+  } else {
+    next();
+  }
+};
 
 //middlewares
 app.use(express.json());
@@ -89,6 +104,7 @@ app.get(
 
 app.post(
   "/campgrounds",
+  validateCampgroundSchema,
   catchAsync(async (req, res) => {
     const { campground } = req.body;
     const newCampground = new Campground({ ...campground });
@@ -106,6 +122,7 @@ app.get(
 );
 app.patch(
   "/campgrounds/:id/edit",
+  validateCampgroundSchema,
   catchAsync(async (req, res) => {
     const { id } = req.params;
     const { campground } = req.body;
