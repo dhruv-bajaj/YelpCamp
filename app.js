@@ -1,9 +1,13 @@
-//Seeting up express server
+//Setting up express server
 const express = require("express");
 const app = express();
 const PORT = 3000;
 const methodOverride = require("method-override");
 const path = require("path");
+
+//Importing catchAsync wrapper function and ExpressError class
+const catchAsync = require("./utils/catchAsync");
+const ExpressError = require("./utils/ExpressError");
 
 //Setting up ejs-mate
 const ejsMate = require("ejs-mate");
@@ -52,65 +56,89 @@ app.use(morgan("tiny"));
 app.get("/", (req, res) => {
   res.redirect("/campgrounds");
 });
-app.get("/campgrounds", async (req, res) => {
-  const campgrounds = await Campground.find({});
-  res.render("campgrounds/index", { campgrounds });
-});
+app.get(
+  "/campgrounds",
+  catchAsync(async (req, res) => {
+    const campgrounds = await Campground.find({});
+    res.render("campgrounds/index", { campgrounds });
+  })
+);
 app.get("/campgrounds/new", (req, res) => {
   res.render("campgrounds/new");
 });
-app.get("/campgrounds/:id", async (req, res) => {
-  const { id } = req.params;
-  try {
+app.get(
+  "/campgrounds/:id",
+  catchAsync(async (req, res) => {
+    const { id } = req.params;
+    try {
+      const campground = await Campground.findOne({ _id: id });
+      res.render("campgrounds/show", { campground });
+    } catch (err) {
+      res.render("error");
+    }
+  })
+);
+app.get(
+  "/campgrounds/:id",
+  catchAsync(async (req, res) => {
+    const { id } = req.params;
     const campground = await Campground.findOne({ _id: id });
     res.render("campgrounds/show", { campground });
-  } catch (err) {
-    res.render("error");
-  }
-});
-app.get("/campgrounds/:id", async (req, res) => {
-  const { id } = req.params;
-  try {
-    const campground = await Campground.findOne({ _id: id });
-    res.render("campgrounds/show", { campground });
-  } catch (err) {
-    res.render("error");
-  }
-});
+  })
+);
 
-app.post("/campgrounds", async (req, res) => {
-  const { campground } = req.body;
-  const newCampground = new Campground({ ...campground });
-  await newCampground.save();
-  res.redirect("/campgrounds");
-});
-app.get("/campgrounds/:id/edit", async (req, res) => {
-  const { id } = req.params;
-  const campground = await Campground.findOne({ _id: id });
-  res.render("campgrounds/edit", { campground });
-});
-app.patch("/campgrounds/:id/edit", async (req, res) => {
-  const { id } = req.params;
-  const { campground } = req.body;
-  console.log(campground);
-  await Campground.findOneAndUpdate({ _id: id }, campground, {
-    runValidators: true,
-  });
-  res.redirect("/campgrounds");
-});
-
-app.delete("/campgrounds/:id", async (req, res) => {
-  const { id } = req.params;
-  try {
-    await Campground.findOneAndDelete({ _id: id });
+app.post(
+  "/campgrounds",
+  catchAsync(async (req, res) => {
+    const { campground } = req.body;
+    const newCampground = new Campground({ ...campground });
+    await newCampground.save();
     res.redirect("/campgrounds");
-  } catch (err) {
-    console.log(`Error while deleting: ${err}`);
-  }
+  })
+);
+app.get(
+  "/campgrounds/:id/edit",
+  catchAsync(async (req, res) => {
+    const { id } = req.params;
+    const campground = await Campground.findOne({ _id: id });
+    res.render("campgrounds/edit", { campground });
+  })
+);
+app.patch(
+  "/campgrounds/:id/edit",
+  catchAsync(async (req, res) => {
+    const { id } = req.params;
+    const { campground } = req.body;
+    await Campground.findOneAndUpdate({ _id: id }, campground, {
+      runValidators: true,
+    });
+    res.redirect("/campgrounds");
+  })
+);
+
+app.delete(
+  "/campgrounds/:id",
+  catchAsync(async (req, res) => {
+    const { id } = req.params;
+    try {
+      await Campground.findOneAndDelete({ _id: id });
+      res.redirect("/campgrounds");
+    } catch (err) {
+      console.log(`Error while deleting: ${err}`);
+    }
+  })
+);
+
+app.all("*", (req, res, next) => {
+  next(new ExpressError("Page Not Found", 404));
 });
 
-app.use((req, res) => {
-  res.status(404).send("Not Found !");
+app.use((err, req, res, next) => {
+  const { statusCode = 500 } = err;
+  if (!err.message) {
+    err.message = "Something went wrong !!!";
+  }
+  res.status(statusCode).render("error", { err });
 });
 
 app.listen(PORT, () => {
