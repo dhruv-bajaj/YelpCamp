@@ -25,6 +25,7 @@ app.set("views", path.join(__dirname, "/views"));
 
 //Importing the models
 const Campground = require("./models/campground");
+const Review = require("./models/review");
 
 //Connecting to database
 const mongoose = require("mongoose");
@@ -32,7 +33,7 @@ const { createDiffieHellmanGroup } = require("crypto");
 
 //Logging
 const morgan = require("morgan");
-const { campgroundSchemaJoi } = require("./schemasJoi");
+const { campgroundSchemaJoi, reviewSchemaJoi } = require("./schemasJoi");
 
 mongoose
   .connect("mongodb://127.0.0.1:27017/yelpcamp")
@@ -49,14 +50,22 @@ mongoose.connection.on("error", (err) => {
 });
 
 //middleware to check schema using Joi
-const validateCampgroundSchema = (req, res, next) => {
-  const { error } = campgroundSchemaJoi.validate(req.body);
-  if (error) {
-    const message = error.details.map((el) => el.message).join(",");
-    throw new ExpressError(message, 400);
-  } else {
-    next();
-  }
+const validateSchemaUsingJoi = (schemaOf) => {
+  return async (req, res, next) => {
+    let validateSchema;
+    if (schemaOf == "Campground") {
+      validateSchema = campgroundSchemaJoi;
+    } else if (schemaOf == "Review") {
+      validateSchema = reviewSchemaJoi;
+    }
+    const { error } = validateSchema.validate(req.body);
+    if (error) {
+      const message = error.details.map((el) => el.message).join(",");
+      next(new ExpressError(message, 400));
+    } else {
+      next();
+    }
+  };
 };
 
 //middlewares
@@ -87,7 +96,8 @@ app.get(
     const { id } = req.params;
     try {
       const campground = await Campground.findOne({ _id: id });
-      res.render("campgrounds/show", { campground });
+      const reviews = await Review.find({ campground: id });
+      res.render("campgrounds/show", { campground, reviews });
     } catch (err) {
       res.render("error");
     }
@@ -104,7 +114,7 @@ app.get(
 
 app.post(
   "/campgrounds",
-  validateCampgroundSchema,
+  validateSchemaUsingJoi("Campground"),
   catchAsync(async (req, res) => {
     const { campground } = req.body;
     const newCampground = new Campground({ ...campground });
@@ -122,7 +132,7 @@ app.get(
 );
 app.patch(
   "/campgrounds/:id/edit",
-  validateCampgroundSchema,
+  validateSchemaUsingJoi("Campground"),
   catchAsync(async (req, res) => {
     const { id } = req.params;
     const { campground } = req.body;
@@ -138,11 +148,32 @@ app.delete(
   catchAsync(async (req, res) => {
     const { id } = req.params;
     try {
-      await Campground.findOneAndDelete({ _id: id });
+      await Campground.findByIdAndDelete({ _id: id });
       res.redirect("/campgrounds");
     } catch (err) {
       console.log(`Error while deleting: ${err}`);
     }
+  })
+);
+
+app.post(
+  "/campgrounds/:id/reviews/new",
+  validateSchemaUsingJoi("Review"),
+  catchAsync(async (req, res) => {
+    const { id: campgroundId } = req.params;
+    const { review } = req.body;
+    const newReview = Review({ ...review, campground: campgroundId });
+    await newReview.save();
+    res.redirect(`/campgrounds/${campgroundId}`);
+  })
+);
+
+app.delete(
+  "/campgrounds/:id/reviews/:reviewId",
+  catchAsync(async (req, res) => {
+    const { id: campgroundId, reviewId: reviewId } = req.params;
+    await Review.deleteOne({ _id: reviewId });
+    res.redirect(`/campgrounds/${campgroundId}`);
   })
 );
 
@@ -151,6 +182,7 @@ app.all("*", (req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
+  console.log("Reached Here");
   const { statusCode = 500 } = err;
   if (!err.message) {
     err.message = "Something went wrong !!!";

@@ -10,4 +10,14 @@ const campgroundSchemaJoi = Joi.object({
   }).required(),
 });
 
-module.exports.campgroundSchemaJoi = campgroundSchemaJoi;
+const reviewSchemaJoi = Joi.object({
+  review: Joi.object({
+    body: Joi.string().required(),
+    rating: Joi.number().required().min(0).max(5),
+  }).required(),
+});
+
+module.exports = {
+  campgroundSchemaJoi,
+  reviewSchemaJoi,
+};
