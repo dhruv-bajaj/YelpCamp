@@ -4,12 +4,10 @@ const app = express();
 const PORT = 3000;
 const methodOverride = require("method-override");
 const path = require("path");
+const campgroundsRouter = require("./routes/campgrounds");
+const reviewsRouter = require("./routes/reviews");
 
-//Requiring Joi for schema validation
-const Joi = require("joi");
-
-//Importing catchAsync wrapper function and ExpressError class
-const catchAsync = require("./utils/catchAsync");
+//Importing  ExpressError class
 const ExpressError = require("./utils/ExpressError");
 
 //Setting up ejs-mate
@@ -23,17 +21,12 @@ app.engine("ejs", ejsMate);
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "/views"));
 
-//Importing the models
-const Campground = require("./models/campground");
-const Review = require("./models/review");
-
 //Connecting to database
 const mongoose = require("mongoose");
 const { createDiffieHellmanGroup } = require("crypto");
 
 //Logging
 const morgan = require("morgan");
-const { campgroundSchemaJoi, reviewSchemaJoi } = require("./schemasJoi");
 
 mongoose
   .connect("mongodb://127.0.0.1:27017/yelpcamp")
@@ -49,25 +42,6 @@ mongoose.connection.on("error", (err) => {
   console.log(err);
 });
 
-//middleware to check schema using Joi
-const validateSchemaUsingJoi = (schemaOf) => {
-  return async (req, res, next) => {
-    let validateSchema;
-    if (schemaOf == "Campground") {
-      validateSchema = campgroundSchemaJoi;
-    } else if (schemaOf == "Review") {
-      validateSchema = reviewSchemaJoi;
-    }
-    const { error } = validateSchema.validate(req.body);
-    if (error) {
-      const message = error.details.map((el) => el.message).join(",");
-      next(new ExpressError(message, 400));
-    } else {
-      next();
-    }
-  };
-};
-
 //middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -77,112 +51,18 @@ app.use(methodOverride("_method"));
 app.use(morgan("tiny"));
 
 //request hadlers
+app.use("/campgrounds", campgroundsRouter);
+app.use("/campgrounds/:id/reviews", reviewsRouter);
+
 app.get("/", (req, res) => {
   res.redirect("/campgrounds");
 });
-app.get(
-  "/campgrounds",
-  catchAsync(async (req, res) => {
-    const campgrounds = await Campground.find({});
-    res.render("campgrounds/index", { campgrounds });
-  })
-);
-app.get("/campgrounds/new", (req, res) => {
-  res.render("campgrounds/new");
-});
-app.get(
-  "/campgrounds/:id",
-  catchAsync(async (req, res) => {
-    const { id } = req.params;
-    try {
-      const campground = await Campground.findOne({ _id: id });
-      const reviews = await Review.find({ campground: id });
-      res.render("campgrounds/show", { campground, reviews });
-    } catch (err) {
-      res.render("error");
-    }
-  })
-);
-app.get(
-  "/campgrounds/:id",
-  catchAsync(async (req, res) => {
-    const { id } = req.params;
-    const campground = await Campground.findOne({ _id: id });
-    res.render("campgrounds/show", { campground });
-  })
-);
-
-app.post(
-  "/campgrounds",
-  validateSchemaUsingJoi("Campground"),
-  catchAsync(async (req, res) => {
-    const { campground } = req.body;
-    const newCampground = new Campground({ ...campground });
-    await newCampground.save();
-    res.redirect("/campgrounds");
-  })
-);
-app.get(
-  "/campgrounds/:id/edit",
-  catchAsync(async (req, res) => {
-    const { id } = req.params;
-    const campground = await Campground.findOne({ _id: id });
-    res.render("campgrounds/edit", { campground });
-  })
-);
-app.patch(
-  "/campgrounds/:id/edit",
-  validateSchemaUsingJoi("Campground"),
-  catchAsync(async (req, res) => {
-    const { id } = req.params;
-    const { campground } = req.body;
-    await Campground.findOneAndUpdate({ _id: id }, campground, {
-      runValidators: true,
-    });
-    res.redirect("/campgrounds");
-  })
-);
-
-app.delete(
-  "/campgrounds/:id",
-  catchAsync(async (req, res) => {
-    const { id } = req.params;
-    try {
-      await Campground.findByIdAndDelete({ _id: id });
-      res.redirect("/campgrounds");
-    } catch (err) {
-      console.log(`Error while deleting: ${err}`);
-    }
-  })
-);
-
-app.post(
-  "/campgrounds/:id/reviews/new",
-  validateSchemaUsingJoi("Review"),
-  catchAsync(async (req, res) => {
-    const { id: campgroundId } = req.params;
-    const { review } = req.body;
-    const newReview = Review({ ...review, campground: campgroundId });
-    await newReview.save();
-    res.redirect(`/campgrounds/${campgroundId}`);
-  })
-);
-
-app.delete(
-  "/campgrounds/:id/reviews/:reviewId",
-  catchAsync(async (req, res) => {
-    const { id: campgroundId, reviewId: reviewId } = req.params;
-    await Review.deleteOne({ _id: reviewId });
-    res.redirect(`/campgrounds/${campgroundId}`);
-  })
-);
 
 app.all("*", (req, res, next) => {
   next(new ExpressError("Page Not Found", 404));
 });
 
 app.use((err, req, res, next) => {
-  console.log("Reached Here");
   const { statusCode = 500 } = err;
   if (!err.message) {
     err.message = "Something went wrong !!!";
