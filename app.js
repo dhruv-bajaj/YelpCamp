@@ -6,6 +6,8 @@ const methodOverride = require("method-override");
 const path = require("path");
 const campgroundsRouter = require("./routes/campgrounds");
 const reviewsRouter = require("./routes/reviews");
+const session = require("express-session");
+const flash = require("connect-flash");
 
 //Importing  ExpressError class
 const ExpressError = require("./utils/ExpressError");
@@ -50,6 +52,25 @@ app.use(methodOverride("_method"));
 //logging middleware
 app.use(morgan("tiny"));
 
+const sessionConfig = {
+  secret: "thisIsASecret!",
+  resave: false,
+  saveUninitialized: true,
+  cookie: {
+    expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+    httpOnly: true,
+  },
+};
+app.use(session(sessionConfig));
+app.use(flash());
+app.use((req, res, next) => {
+  res.locals.message = req.flash("message");
+  res.locals.errorMessage = req.flash("errorMessage");
+  next();
+});
+
+app.use(express.static(path.join(__dirname, "public")));
 //request hadlers
 app.use("/campgrounds", campgroundsRouter);
 app.use("/campgrounds/:id/reviews", reviewsRouter);

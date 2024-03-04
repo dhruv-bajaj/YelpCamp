@@ -12,6 +12,7 @@ router.post(
     const { review } = req.body;
     const newReview = Review({ ...review, campground: campgroundId });
     await newReview.save();
+    req.flash("message", "Successfully made a new review");
     res.redirect(`/campgrounds/${campgroundId}`);
   })
 );
@@ -21,6 +22,7 @@ router.delete(
   catchAsync(async (req, res) => {
     const { id: campgroundId, reviewId: reviewId } = req.params;
     await Review.deleteOne({ _id: reviewId });
+    req.flash("message", "Successfully deleted the review");
     res.redirect(`/campgrounds/${campgroundId}`);
   })
 );

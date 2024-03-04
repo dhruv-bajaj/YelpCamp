@@ -21,19 +21,15 @@ router.get(
     const { id } = req.params;
     try {
       const campground = await Campground.findOne({ _id: id });
+      if(!campground){
+        req.flash("errorMessage", "Campground not found");
+        return res.redirect("/campgrounds");
+      }
       const reviews = await Review.find({ campground: id });
       res.render("campgrounds/show", { campground, reviews });
     } catch (err) {
       res.render("error");
     }
-  })
-);
-router.get(
-  "/:id",
-  catchAsync(async (req, res) => {
-    const { id } = req.params;
-    const campground = await Campground.findOne({ _id: id });
-    res.render("campgrounds/show", { campground });
   })
 );
 
@@ -44,7 +40,8 @@ router.post(
     const { campground } = req.body;
     const newCampground = new Campground({ ...campground });
     await newCampground.save();
-    res.redirect("/campgrounds");
+    req.flash("message", "Successfully made a new campground");
+    res.redirect(`/campgrounds/${newCampground._id}`);
   })
 );
 router.get(
@@ -64,6 +61,7 @@ router.patch(
     await Campground.findOneAndUpdate({ _id: id }, campground, {
       runValidators: true,
     });
+    req.flash("message", "Successfully updated the campground");
     res.redirect("/campgrounds");
   })
 );
@@ -74,6 +72,7 @@ router.delete(
     const { id } = req.params;
     try {
       await Campground.findByIdAndDelete({ _id: id });
+      req.flash("message", "Successfully deleted the campground");
       res.redirect("/campgrounds");
     } catch (err) {
       console.log(`Error while deleting: ${err}`);

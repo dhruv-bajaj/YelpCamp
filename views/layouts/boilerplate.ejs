@@ -12,10 +12,13 @@
       crossorigin="anonymous"
     />
   </head>
+
   <body class="d-flex flex-column vh-100">
     <%- include("../partials/navbar.ejs")%>
 
-    <main class="container mt-5"><%- body %></main>
+    <main class="container mt-5">
+      <%- include("../partials/flash.ejs")%> <%- body %>
+    </main>
 
     <%- include("../partials/footer.ejs")%>
 
@@ -25,38 +28,6 @@
       integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
       crossorigin="anonymous"
     ></script>
-    <script>
-      let currentDate = new Date();
-      let currentYear = currentDate.getFullYear();
-      let currentYearElement = document.getElementById("currentYear");
-      currentYearElement.textContent = currentYear;
-
-      (() => {
-        "use strict";
-        // Fetch all the forms we want to apply custom Bootstrap validation styles to
-        const forms = document.querySelectorAll(".validated-form");
-        // Loop over them and prevent submission
-        Array.from(forms).forEach((form) => {
-          form.addEventListener(
-            "submit",
-            (event) => {
-              if (!form.checkValidity()) {
-                event.preventDefault();
-                event.stopPropagation();
-              }
-
-              form.classList.add("was-validated");
-            },
-            false
-          );
-        });
-      })();
-
-      const slider = document.getElementById("rating");
-      slider.addEventListener("input", () => {
-        const ratingInput = document.getElementById("ratingInput");
-        ratingInput.innerHTML = `${slider.value}/5`;
-      });
-    </script>
+    <script src="/js/validateFormsAndSliderUpdate.js"></script>
   </body>
 </html>
