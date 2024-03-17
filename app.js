@@ -5,9 +5,13 @@ const PORT = 3000;
 const methodOverride = require("method-override");
 const path = require("path");
 const campgroundsRouter = require("./routes/campgrounds");
+const usersRouter = require("./routes/users");
 const reviewsRouter = require("./routes/reviews");
 const session = require("express-session");
 const flash = require("connect-flash");
+const passport = require("passport");
+const LocalStrategy = require("passport-local");
+const User = require('./models/user');
 
 //Importing  ExpressError class
 const ExpressError = require("./utils/ExpressError");
@@ -64,14 +68,23 @@ const sessionConfig = {
 };
 app.use(session(sessionConfig));
 app.use(flash());
+
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new LocalStrategy(User.authenticate()));
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+
 app.use((req, res, next) => {
   res.locals.message = req.flash("message");
   res.locals.errorMessage = req.flash("errorMessage");
+  res.locals.error = req.flash("error");
   next();
 });
 
 app.use(express.static(path.join(__dirname, "public")));
 //request hadlers
+app.use('/',usersRouter)
 app.use("/campgrounds", campgroundsRouter);
 app.use("/campgrounds/:id/reviews", reviewsRouter);
 

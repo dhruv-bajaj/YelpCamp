@@ -25,7 +25,9 @@ currentYearElement.textContent = currentYear;
 })();
 
 const slider = document.getElementById("rating");
-slider.addEventListener("input", () => {
-  const ratingInput = document.getElementById("ratingInput");
-  ratingInput.innerHTML = `${slider.value}/5`;
-});
+if (slider) {
+  slider.addEventListener("input", () => {
+    const ratingInput = document.getElementById("ratingInput");
+    ratingInput.innerHTML = `${slider.value}/5`;
+  });
+}
