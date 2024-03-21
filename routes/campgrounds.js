@@ -4,6 +4,7 @@ const catchAsync = require("../utils/catchAsync");
 const Campground = require("../models/campground");
 const Review = require("../models/review");
 const validateSchemaUsingJoi = require("../utils/validateSchemaUsingJoi");
+const isAuthenticated = require("../utils/isAuthenticated");
 
 router.get(
   "/",
@@ -12,7 +13,7 @@ router.get(
     res.render("campgrounds/index", { campgrounds });
   })
 );
-router.get("/new", (req, res) => {
+router.get("/new", isAuthenticated, (req, res) => {
   res.render("campgrounds/new");
 });
 router.get(
@@ -21,7 +22,7 @@ router.get(
     const { id } = req.params;
     try {
       const campground = await Campground.findOne({ _id: id });
-      if(!campground){
+      if (!campground) {
         req.flash("errorMessage", "Campground not found");
         return res.redirect("/campgrounds");
       }
@@ -35,6 +36,7 @@ router.get(
 
 router.post(
   "/",
+  isAuthenticated,
   validateSchemaUsingJoi("Campground"),
   catchAsync(async (req, res) => {
     const { campground } = req.body;
@@ -46,6 +48,7 @@ router.post(
 );
 router.get(
   "/:id/edit",
+  isAuthenticated,
   catchAsync(async (req, res) => {
     const { id } = req.params;
     const campground = await Campground.findOne({ _id: id });
@@ -54,6 +57,7 @@ router.get(
 );
 router.patch(
   "/:id/edit",
+  isAuthenticated,
   validateSchemaUsingJoi("Campground"),
   catchAsync(async (req, res) => {
     const { id } = req.params;
@@ -68,6 +72,7 @@ router.patch(
 
 router.delete(
   "/:id",
+  isAuthenticated,
   catchAsync(async (req, res) => {
     const { id } = req.params;
     try {

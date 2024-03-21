@@ -3,10 +3,11 @@ const router = express.Router({ mergeParams: true });
 const catchAsync = require("../utils/catchAsync");
 const Review = require("../models/review");
 const validateSchemaUsingJoi = require("../utils/validateSchemaUsingJoi");
-
+const isAuthenticated = require("../utils/isAuthenticated");
 router.post(
   "/new",
   validateSchemaUsingJoi("Review"),
+  isAuthenticated,
   catchAsync(async (req, res) => {
     const { id: campgroundId } = req.params;
     const { review } = req.body;
@@ -19,6 +20,7 @@ router.post(
 
 router.delete(
   "/:reviewId",
+  isAuthenticated,
   catchAsync(async (req, res) => {
     const { id: campgroundId, reviewId: reviewId } = req.params;
     await Review.deleteOne({ _id: reviewId });
