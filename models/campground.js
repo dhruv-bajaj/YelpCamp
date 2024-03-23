@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Review = require("./review");
 const { Schema, model } = mongoose;
+const User = require("./user");
 
 // Creating the schema
 const CampgroundSchema = new Schema({
@@ -24,6 +25,10 @@ const CampgroundSchema = new Schema({
     type: String,
     required: true,
   },
+  author:{
+    type: Schema.Types.ObjectId,
+    ref: 'User'
+  }
 });
 
 //Middleware to delete all associated reviews

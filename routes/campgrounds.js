@@ -5,6 +5,7 @@ const Campground = require("../models/campground");
 const Review = require("../models/review");
 const validateSchemaUsingJoi = require("../utils/validateSchemaUsingJoi");
 const isAuthenticated = require("../utils/isAuthenticated");
+const isAuthor = require("../utils/isAuthor");
 
 router.get(
   "/",
@@ -21,12 +22,14 @@ router.get(
   catchAsync(async (req, res) => {
     const { id } = req.params;
     try {
-      const campground = await Campground.findOne({ _id: id });
+      const campground = await Campground.findOne({ _id: id }).populate(
+        "author"
+      );
       if (!campground) {
         req.flash("errorMessage", "Campground not found");
         return res.redirect("/campgrounds");
       }
-      const reviews = await Review.find({ campground: id });
+      const reviews = await Review.find({ campground: id }).populate('author');
       res.render("campgrounds/show", { campground, reviews });
     } catch (err) {
       res.render("error");
@@ -40,7 +43,10 @@ router.post(
   validateSchemaUsingJoi("Campground"),
   catchAsync(async (req, res) => {
     const { campground } = req.body;
-    const newCampground = new Campground({ ...campground });
+    const newCampground = new Campground({
+      ...campground,
+      author: req.user._id,
+    });
     await newCampground.save();
     req.flash("message", "Successfully made a new campground");
     res.redirect(`/campgrounds/${newCampground._id}`);
@@ -49,6 +55,7 @@ router.post(
 router.get(
   "/:id/edit",
   isAuthenticated,
+  isAuthor,
   catchAsync(async (req, res) => {
     const { id } = req.params;
     const campground = await Campground.findOne({ _id: id });
@@ -58,6 +65,7 @@ router.get(
 router.patch(
   "/:id/edit",
   isAuthenticated,
+  isAuthor,
   validateSchemaUsingJoi("Campground"),
   catchAsync(async (req, res) => {
     const { id } = req.params;
@@ -73,6 +81,7 @@ router.patch(
 router.delete(
   "/:id",
   isAuthenticated,
+  isAuthor,
   catchAsync(async (req, res) => {
     const { id } = req.params;
     try {
