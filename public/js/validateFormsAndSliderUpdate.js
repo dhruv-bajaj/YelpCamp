@@ -26,8 +26,17 @@ currentYearElement.textContent = currentYear;
 
 const slider = document.getElementById("rating");
 if (slider) {
-  slider.addEventListener("input", () => {
-    const ratingInput = document.getElementById("ratingInput");
-    ratingInput.innerHTML = `${slider.value}/5`;
-  });
+  const ratingInput = document.getElementById("ratingInput");
+  slider.addEventListener("input",()=>{
+    console.log("Hello");
+    const elements = slider.getElementsByTagName("input");
+    let maxRating = 0;
+    for (const ele of elements) {
+      if (ele.checked) {
+        maxRating = Math.max(maxRating, ele.value);
+      }
+    }
+    ratingInput.innerHTML = `${maxRating}/5`;
+  })
 }
+ 
