@@ -13,13 +13,12 @@
           alt="Campground Image"
           height="400px"
           width="400px"
-          src="<%=campground.image %>"
+          src="<%=campground.images[0].url %>"
         />
       </div>
       <div class="col-md-8">
         <div class="card-body" style="border: 0px">
           <h5 class="card-title"><%=campground.title%></h5>
-          <p class="card-text"><%=campground.description%></p>
           <p class="card-text"><%=campground.description%></p>
           <p class="card-text">
             <small class="text-muted"><%=campground.location%></small>

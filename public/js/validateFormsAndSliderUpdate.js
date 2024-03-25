@@ -28,7 +28,6 @@ const slider = document.getElementById("rating");
 if (slider) {
   const ratingInput = document.getElementById("ratingInput");
   slider.addEventListener("input",()=>{
-    console.log("Hello");
     const elements = slider.getElementsByTagName("input");
     let maxRating = 0;
     for (const ele of elements) {

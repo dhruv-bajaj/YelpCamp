@@ -6,6 +6,10 @@ const isAuthenticated = require("../utils/isAuthenticated");
 const isAuthor = require("../utils/isAuthor");
 const campgroundController = require("../controllers/campgrounds");
 
+const multer = require("multer");
+const { storage } = require("../cloudinary/index");
+const upload = multer({ storage });
+
 router.get("/", catchAsync(campgroundController.index));
 
 router.get("/new", isAuthenticated, campgroundController.new);
@@ -15,6 +19,7 @@ router.get("/:id", catchAsync(campgroundController.getCampgroundById));
 router.post(
   "/",
   isAuthenticated,
+  upload.array("images", 5),
   validateSchemaUsingJoi("Campground"),
   catchAsync(campgroundController.createCampground)
 );
@@ -30,6 +35,7 @@ router.patch(
   "/:id/edit",
   isAuthenticated,
   isAuthor,
+  upload.array("images", 5),
   validateSchemaUsingJoi("Campground"),
   catchAsync(campgroundController.updateCampground)
 );

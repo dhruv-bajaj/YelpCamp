@@ -17,18 +17,28 @@ const CampgroundSchema = new Schema({
     type: String,
     required: true,
   },
-  image: {
-    type: String,
-    required: true,
+  images: {
+    type: Array,
+    of: new Schema({
+      url: {
+        type: String,
+        required: true,
+      },
+      fileName: {
+        type: String,
+        required: true,
+      },
+    }),
+    validate: (imagesArray) => imagesArray.length > 0,
   },
   location: {
     type: String,
     required: true,
   },
-  author:{
+  author: {
     type: Schema.Types.ObjectId,
-    ref: 'User'
-  }
+    ref: "User",
+  },
 });
 
 //Middleware to delete all associated reviews

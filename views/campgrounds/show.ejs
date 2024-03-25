@@ -4,7 +4,25 @@
   <div class="row">
     <div class="col-6">
       <div class="card mb-3">
-        <img src="<%= campground.image%>" class="card-img-top" alt="..." />
+        <div id="carouselCampground" class="carousel slide">
+          <div class="carousel-inner">
+            <%campground.images.forEach((image,idx)=>{%>
+              <div class="carousel-item <%= idx===0?'active':''%>">
+                <img src=<%=image.url%> class="d-block w-100" alt="<%=idx+1%> Campground Image"/>
+              </div>
+              <%})%>
+          </div>
+          <%if(campground.images.length > 1){%>
+          <button class="carousel-control-prev" type="button" data-bs-target="#carouselCampground" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+          </button>
+          <button class="carousel-control-next" type="button" data-bs-target="#carouselCampground" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+          </button>
+          <%}%>
+        </div>
         <div class="card-body">
           <h5 class="card-title">
             <%= campground.title%>

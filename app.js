@@ -1,3 +1,7 @@
+//Requiring the env variables
+if (process.env.NODE_ENV !== "production") {
+  require("dotenv").config();
+}
 //Setting up express server
 const express = require("express");
 const app = express();
@@ -11,7 +15,7 @@ const session = require("express-session");
 const flash = require("connect-flash");
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
-const User = require('./models/user');
+const User = require("./models/user");
 
 //Importing  ExpressError class
 const ExpressError = require("./utils/ExpressError");
@@ -35,7 +39,7 @@ const { createDiffieHellmanGroup } = require("crypto");
 const morgan = require("morgan");
 
 mongoose
-  .connect("mongodb://127.0.0.1:27017/yelpcamp")
+  .connect(process.env.DBSTR)
   .then(() => {
     console.log("Connected to database");
   })
@@ -85,7 +89,7 @@ app.use((req, res, next) => {
 
 app.use(express.static(path.join(__dirname, "public")));
 //request hadlers
-app.use('/',usersRouter)
+app.use("/", usersRouter);
 app.use("/campgrounds", campgroundsRouter);
 app.use("/campgrounds/:id/reviews", reviewsRouter);
 
