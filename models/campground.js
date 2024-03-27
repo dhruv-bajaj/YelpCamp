@@ -3,6 +3,20 @@ const Review = require("./review");
 const { Schema, model } = mongoose;
 const User = require("./user");
 
+const ImageSchema = new Schema({
+  url: {
+    type: String,
+    required: true,
+  },
+  fileName: {
+    type: String,
+    required: true,
+  },
+});
+
+ImageSchema.virtual("thumbnail").get(function () {
+  return this.url.replace("/upload","/upload/w_200");
+});
 // Creating the schema
 const CampgroundSchema = new Schema({
   title: {
@@ -19,16 +33,7 @@ const CampgroundSchema = new Schema({
   },
   images: {
     type: Array,
-    of: new Schema({
-      url: {
-        type: String,
-        required: true,
-      },
-      fileName: {
-        type: String,
-        required: true,
-      },
-    }),
+    of: ImageSchema,
     validate: (imagesArray) => imagesArray.length > 0,
   },
   location: {
