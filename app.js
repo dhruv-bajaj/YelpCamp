@@ -16,6 +16,8 @@ const flash = require("connect-flash");
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
 const User = require("./models/user");
+const mongoSanitize = require("express-mongo-sanitize");
+const helmet = require("helmet");
 
 //Importing  ExpressError class
 const ExpressError = require("./utils/ExpressError");
@@ -56,22 +58,56 @@ mongoose.connection.on("error", (err) => {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
+app.use(mongoSanitize());
 
 //logging middleware
 app.use(morgan("tiny"));
 
 const sessionConfig = {
-  secret: "thisIsASecret!",
+  name: "yelpcampsession",
+  secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: true,
   cookie: {
     expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
     maxAge: 7 * 24 * 60 * 60 * 1000,
     httpOnly: true,
+    secure: process.NODE_ENV === "production" ? true : false,
   },
 };
 app.use(session(sessionConfig));
 app.use(flash());
+
+//helmet middleware
+app.use(helmet());
+
+const scriptSrcUrls = [
+  "https://cdn.jsdelivr.net"
+];
+const styleSrcUrls = [
+  "https://cdn.jsdelivr.net",
+];
+
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      defaultSrc: [],
+      connectSrc: ["'self'"],
+      scriptSrc: ["'unsafe-inline'", "'self'", ...scriptSrcUrls],
+      styleSrc: ["'self'", "'unsafe-inline'", ...styleSrcUrls],
+      workerSrc: ["'self'", "blob:"],
+      objectSrc: [],
+      imgSrc: [
+        "'self'",
+        "blob:",
+        "data:",
+        "https://res.cloudinary.com/dma8h02vh/",
+        "https://images.unsplash.com/",
+      ],
+      fontSrc: ["'self'"],
+    },
+  })
+);
 
 app.use(passport.initialize());
 app.use(passport.session());
@@ -94,7 +130,7 @@ app.use("/campgrounds", campgroundsRouter);
 app.use("/campgrounds/:id/reviews", reviewsRouter);
 
 app.get("/", (req, res) => {
-  res.redirect("/campgrounds");
+  res.render("home");
 });
 
 app.all("*", (req, res, next) => {

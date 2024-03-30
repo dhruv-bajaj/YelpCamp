@@ -78,7 +78,7 @@ module.exports.updateCampground = async (req, res) => {
     runValidators: true,
   });
   req.flash("message", "Successfully updated the campground");
-  res.redirect("/campgrounds");
+  res.redirect(`/campgrounds/${id}`);
 };
 
 module.exports.deleteCampground = async (req, res) => {

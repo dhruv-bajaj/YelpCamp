@@ -1,8 +1,8 @@
 <% layout('layouts/boilerplate')%>
   <link rel="stylesheet" href="/stylesheets/stars.css" />
 
-  <div class="row">
-    <div class="col-6">
+  <div class="d-flex flex-md-row flex-column">
+    <div class="col-md-6 p-2">
       <div class="card mb-3">
         <div id="carouselCampground" class="carousel slide">
           <div class="carousel-inner">
@@ -50,7 +50,7 @@
             <div class="card-footer text-muted">2 days ago</div>
       </div>
     </div>
-    <div class="col-6">
+    <div class="col-md-6 p-2">
       <div class="mb-1">
         <%if(currentUser){%>
           <h4>Leave a review:</h4>

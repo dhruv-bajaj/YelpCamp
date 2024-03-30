@@ -2,75 +2,85 @@
 <div class="row">
   <h1 class="text-center">New Campground</h1>
   <!-- The below div spans to 6 columns but offset is 3. So 3-6-3, total 12. Another way of centering -->
-  <div class="col-6 offset-3">
-    <form action="/campgrounds" method="POST" novalidate class="validated-form" enctype="multipart/form-data">
-      <div class="mb-3">
-        <label class="form-label" for="title">Title</label>
-        <input
-          class="form-control"
-          type="text"
-          id="title"
-          name="campground[title]"
-          required
-        />
-        <div class="valid-feedback">Looks good!</div>
+  <div class="col-md-6 offset-md-3">
+    <div class="card shadow">
+      <div class="card-body">
+        <form
+          action="/campgrounds"
+          method="POST"
+          novalidate
+          class="validated-form"
+          enctype="multipart/form-data"
+        >
+          <div class="mb-3">
+            <label class="form-label" for="title">Title</label>
+            <input
+              class="form-control"
+              type="text"
+              id="title"
+              name="campground[title]"
+              required
+            />
+            <div class="valid-feedback">Looks good!</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="description">Description</label>
+            <textarea
+              class="form-control"
+              type="text"
+              id="description"
+              name="campground[description]"
+              required
+            ></textarea>
+            <div class="valid-feedback">Looks good!</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="image">Images</label>
+            <input
+              class="form-control"
+              type="file"
+              id="image"
+              name="images"
+              multiple="multiple"
+              required
+            />
+            <div class="valid-feedback">Looks good!</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="location">Location</label>
+            <input
+              class="form-control"
+              type="text"
+              id="location"
+              name="campground[location]"
+              required
+            />
+            <div class="valid-feedback">Looks good!</div>
+          </div>
+          <div class="input-group mb-3">
+            <label class="form-label" for="price">Price</label>
+            <div class="input-group">
+              <span
+                class="input-group-text"
+                id="price-label"
+                aria-labelledby="price"
+                >&#8377;</span
+              >
+              <input
+                type="number"
+                id="price"
+                placeholder="0"
+                name="campground[price]"
+                class="form-control"
+                aria-label="Amount (in Rupees)"
+                required
+              />
+              <div class="valid-feedback">Looks good!</div>
+            </div>
+          </div>
+          <button class="btn btn-primary" type="submit">Submit</button>
+        </form>
       </div>
-      <div class="mb-3">
-        <label class="form-label" for="description">Description</label>
-        <textarea
-          class="form-control"
-          type="text"
-          id="description"
-          name="campground[description]"
-          required
-        ></textarea>
-        <div class="valid-feedback">Looks good!</div>
-      </div>
-      <div class="mb-3">
-        <label class="form-label" for="image">Images</label>
-        <input
-          class="form-control"
-          type="file"
-          id="image"
-          name="images"
-          multiple="multiple"
-          required
-        />
-        <div class="valid-feedback">Looks good!</div>
-      </div>
-      <div class="mb-3">
-        <label class="form-label" for="location">Location</label>
-        <input
-          class="form-control"
-          type="text"
-          id="location"
-          name="campground[location]"
-          required
-        />
-        <div class="valid-feedback">Looks good!</div>
-      </div>
-      <div class="input-group mb-3">
-        <label class="form-label" for="price">Price</label>
-        <div class="input-group">
-          <span
-            class="input-group-text"
-            id="price-label"
-            aria-labelledby="price"
-            >&#8377;</span
-          >
-          <input
-            type="number"
-            id="price"
-            placeholder="0"
-            name="campground[price]"
-            class="form-control"
-            aria-label="Amount (in Rupees)"
-            required
-          />
-          <div class="valid-feedback">Looks good!</div>
-        </div>
-      </div>
-      <button class="btn btn-primary" type="submit">Submit</button>
-    </form>
+    </div>
   </div>
 </div>

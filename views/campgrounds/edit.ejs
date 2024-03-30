@@ -2,7 +2,9 @@
 <div class="row">
   <h1 class="text-center">Edit Campground</h1>
   <!-- The below div spans to 6 columns but offset is 3. So 3-6-3, total 12. Another way of centering -->
-  <div class="col-6 offset-3">
+  <div class="col-md-6 offset-md-3">
+    <div class="card shadow">
+      <div class="card-body">
     <form
       action="/campgrounds/<%=campground._id%>/edit?_method=PATCH"
       method="POST"
@@ -91,5 +93,7 @@
       </div>
       <button class="btn btn-primary" type="submit">Update</button>
     </form>
+    </div>
+  </div>
   </div>
 </div>
