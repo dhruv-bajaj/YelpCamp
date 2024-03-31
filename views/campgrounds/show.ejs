@@ -8,7 +8,7 @@
           <div class="carousel-inner">
             <%campground.images.forEach((image,idx)=>{%>
               <div class="carousel-item <%= idx===0?'active':''%>">
-                <img src=<%=image.url%> class="d-block w-100" alt="<%=idx+1%> Campground Image"/>
+                <img src=<%=image.url%> class="d-block w-100 img-carousel" alt="<%=idx+1%> Campground Image"/>
               </div>
               <%})%>
           </div>

@@ -11,13 +11,15 @@ const path = require("path");
 const campgroundsRouter = require("./routes/campgrounds");
 const usersRouter = require("./routes/users");
 const reviewsRouter = require("./routes/reviews");
-const session = require("express-session");
 const flash = require("connect-flash");
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
 const User = require("./models/user");
 const mongoSanitize = require("express-mongo-sanitize");
 const helmet = require("helmet");
+
+const session = require("express-session");
+const MongoStore = require("connect-mongo");
 
 //Importing  ExpressError class
 const ExpressError = require("./utils/ExpressError");
@@ -40,10 +42,11 @@ const { createDiffieHellmanGroup } = require("crypto");
 //Logging
 const morgan = require("morgan");
 
-mongoose
+const connection  = mongoose
   .connect(process.env.DBSTR)
-  .then(() => {
+  .then((m) => {
     console.log("Connected to database");
+    return m.connection.getClient();
   })
   .catch((err) => {
     console.log(`Error while connecting to db: ${err}`);
@@ -63,9 +66,18 @@ app.use(mongoSanitize());
 //logging middleware
 app.use(morgan("tiny"));
 
+const store = MongoStore.create({
+  clientPromise: connection,
+  touchAfter: 24 * 3600,
+  crypto: {
+    secret: process.env.STORE_SECRET,
+  }
+});
+
 const sessionConfig = {
+  store: store,
   name: "yelpcampsession",
-  secret: process.env.SESSION_SECRET,
+  secret:  process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: true,
   cookie: {
@@ -81,12 +93,8 @@ app.use(flash());
 //helmet middleware
 app.use(helmet());
 
-const scriptSrcUrls = [
-  "https://cdn.jsdelivr.net"
-];
-const styleSrcUrls = [
-  "https://cdn.jsdelivr.net",
-];
+const scriptSrcUrls = ["https://cdn.jsdelivr.net"];
+const styleSrcUrls = ["https://cdn.jsdelivr.net"];
 
 app.use(
   helmet.contentSecurityPolicy({
